@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Chirp;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 
 class ChirpController extends Controller
 {
@@ -109,10 +109,7 @@ class ChirpController extends Controller
 
         Gate::authorize('delete', $chirp);
 
-
-
         $chirp->delete();
-
 
         return redirect(route('chirps.index'));
     }
