@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Chirp;
@@ -18,8 +19,10 @@ class ChirpController extends Controller
     {
         return view('chirps.index', [
 
-            'chirps' => Chirp::with('user')->latest()->get(),
-
+            'chirps' => Chirp::with('user')
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->latest()
+            ->get(),
         ]);
     }
 

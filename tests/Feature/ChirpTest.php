@@ -139,4 +139,42 @@ class ChirpTest extends TestCase
         $reponse->assertRedirect(route('chirps.index'));
         $reponse->assertSessionHasErrors(['message']);
     }
+
+    public function test_seuls_les_chirps_recents_sont_affiches()
+    {
+        $utilisateur = User::factory()->create();
+        $this->actingAs($utilisateur);
+
+        Chirp::factory()->create([
+            'message' => 'Chirp vieux de 8 jours',
+            'created_at' => now()->subDays(8),
+            'user_id' => $utilisateur->id,
+        ]);
+
+        Chirp::factory()->create([
+            'message' => 'Chirp vieux de 6 jours',
+            'created_at' => now()->subDays(6),
+            'user_id' => $utilisateur->id,
+        ]);
+
+        Chirp::factory()->create([
+            'message' => 'Chirp vieux de 3 jours',
+            'created_at' => now()->subDays(3),
+            'user_id' => $utilisateur->id,
+        ]);
+
+        Chirp::factory()->create([
+            'message' => "Chirp créé aujourd'hui",
+            'created_at' => now(),
+            'user_id' => $utilisateur->id,
+        ]);
+
+        $reponse = $this->get('/chirps');
+
+        $reponse->assertSee('Chirp vieux de 6 jours');
+        $reponse->assertSee('Chirp vieux de 3 jours');
+        $reponse->assertSee("Chirp créé aujourd\'hui");
+        $reponse->assertDontSee('Chirp vieux de 8 jours');
+    }
+
 }
