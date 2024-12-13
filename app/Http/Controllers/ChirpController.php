@@ -36,6 +36,14 @@ class ChirpController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $chirpCount = $request->user()->chirps()->count();
+
+        if ($chirpCount >= 10) {
+            return redirect()->route('chirps.index')->withErrors([
+                'message' => "Vous ne pouvez pas créer plus de 10 chips. Donnez la chance á d'autres utilisateur aussi."
+            ]);
+        }
+
         $validated = $request->validate([
 
             'message' => 'required|string|max:255',
@@ -48,7 +56,7 @@ class ChirpController extends Controller
 
 
 
-        return redirect(route('chirps.index'));
+        return redirect()->route('chirps.index')->with('success', 'Chirp créé avec succès.');
     }
 
     /**

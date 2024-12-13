@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Chirp;
 use App\Models\User;
+use Symfony\Component\CssSelector\Node\FunctionNode;
 use Tests\TestCase;
 
 class ChirpTest extends TestCase
@@ -123,6 +124,19 @@ class ChirpTest extends TestCase
         $reponse = $this->put("/chirps/{$chirp->id}", [
             'message' => str_repeat('a',256),
         ]);
+        $reponse->assertSessionHasErrors(['message']);
+    }
+
+    public function test_utilisateur_ne_peut_pas_creer_plus_de_10_chirps() {
+        $utilisateur = User::factory()->create();
+        Chirp::factory()->count(10)->create([
+            'user_id' => $utilisateur->id,
+        ]);
+        $this->actingAs($utilisateur);
+        $reponse = $this->post("/chirps",[
+            'message' => 'Chirp 11',
+        ]);
+        $reponse->assertRedirect(route('chirps.index'));
         $reponse->assertSessionHasErrors(['message']);
     }
 }
