@@ -85,5 +85,11 @@ class ChirpTest extends TestCase
     public function test_un_utilisateur_peut_supprimer_son_chirp() {
         $utilisateur = User::factory()->create();
         $this->actingAs($utilisateur);
+        $chirp = Chirp::factory()->create(['user_id' => $utilisateur->id]);
+        $reponse = $this->delete("/chirps/{$chirp->id}");
+        $reponse->assertStatus(302);
+        $this->assertDatabaseMissing('chirps', [
+            'id' => $chirp->id,
+        ]);
     }
 }
