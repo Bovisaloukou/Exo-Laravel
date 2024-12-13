@@ -69,8 +69,8 @@ class ChirpTest extends TestCase
     public function test_un_utilisateur_peut_modifier_son_chirp()
     {
         $utilisateur = User::factory()->create();
-        $this->actingAs($utilisateur);
         $chirp = Chirp::factory()->create(['user_id' => $utilisateur->id]);
+        $this->actingAs($utilisateur);
         $reponse = $this->put("/chirps/{$chirp->id}", [
             'message' => 'Chirp modifié'
         ]);
@@ -80,5 +80,10 @@ class ChirpTest extends TestCase
             'id' => $chirp->id,
             'message' => 'Chirp modifié',
         ]);
+    }
+
+    public function test_un_utilisateur_peut_supprimer_son_chirp() {
+        $utilisateur = User::factory()->create();
+        $this->actingAs($utilisateur);
     }
 }
