@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Chirp;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -44,12 +45,24 @@ class ChirpTest extends TestCase
         $reponse->assertSessionHasErrors(['message']);
     }
 
-    public function test_un_chirp_ne_peut_pas_depasse_255_caracteres() {
+    public function test_un_chirp_ne_peut_pas_depasse_255_caracteres()
+    {
         $utilisateur = User::factory()->create();
         $this->actingAs($utilisateur);
         $reponse = $this->post('/chirps', [
             'message' => str_repeat('a', 256)
         ]);
         $reponse->assertSessionHasErrors(['message']);
+    }
+
+    public function test_les_chirps_sont_affiches_sur_la_page_d_accueil()
+    {
+        $utilisateur = User::factory()->create();
+        $this->actingAs($utilisateur);
+        $chirps = Chirp::factory()->count(3)->create(['user_id' => $utilisateur->id]);
+        $reponse = $this->get('/chirps');
+        foreach ($chirps as $chirp) {
+            $reponse->assertSee($chirp->message);
+        }
     }
 }
