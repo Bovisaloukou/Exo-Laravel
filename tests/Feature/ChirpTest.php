@@ -108,4 +108,21 @@ class ChirpTest extends TestCase
         $reponse = $this->delete("/chirps/{$chirp->id}");
         $reponse->assertStatus(403);
     }
+
+    public function test_un_utilisateur_ne_peut_pas_modifier_un_chirp_en_donnant_une_valeur_nulle_ou_superieure_a_255_caracteres() {
+        $utilisateur = User::factory()->create();
+        $chirp = Chirp::factory()->create([
+            'user_id' => $utilisateur->id,
+        ]);
+        $this->actingAs($utilisateur);
+        $reponse = $this->put("/chirps/{$chirp->id}", [
+            'message' => '',
+        ]);
+        $reponse->assertSessionHasErrors(['message']);
+
+        $reponse = $this->put("/chirps/{$chirp->id}", [
+            'message' => str_repeat('a',256),
+        ]);
+        $reponse->assertSessionHasErrors(['message']);
+    }
 }
